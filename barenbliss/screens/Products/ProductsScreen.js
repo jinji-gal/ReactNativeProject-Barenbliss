@@ -26,7 +26,7 @@ import API from '../../utils/api';
 const API_URL = "http://192.168.100.170:3000/api";
 const BASE_URL = "http://192.168.100.170:3000"; // Base URL without /api
 
-const ProductsScreen = ({ navigation }) => {
+const ProductsScreen = ({ navigation, route }) => {
   const { stateProducts, dispatch } = useContext(ProductContext);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(stateProducts.products || []);
@@ -41,6 +41,17 @@ const ProductsScreen = ({ navigation }) => {
   
   // Add this line to get reviews from Redux
   const { productReviews } = useSelector(state => state.reviews);
+  
+  // Check if we have a promo code passed from HomeScreen
+  useEffect(() => {
+    if (route.params?.promoCode) {
+      Alert.alert(
+        "Promotion Code",
+        `Remember to use code ${route.params.promoCode} at checkout for a discount!`,
+        [{ text: "OK", onPress: () => navigation.setParams({ promoCode: null }) }]
+      );
+    }
+  }, [route.params?.promoCode]);
   
   // Fetch products from API
   const fetchProducts = async () => {

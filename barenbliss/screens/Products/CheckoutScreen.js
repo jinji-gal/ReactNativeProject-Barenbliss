@@ -21,7 +21,7 @@ import styles from './styles/CheckoutScreen.styles';
 
 const API_URL = "http://192.168.100.170:3000/api"; // Update with your server IP
 
-const CheckoutScreen = ({ navigation }) => {
+const CheckoutScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
   const { stateProducts } = useContext(ProductContext);
   const cartItems = useSelector(state => state.cart.items);
@@ -39,6 +39,37 @@ const CheckoutScreen = ({ navigation }) => {
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [appliedPromo, setAppliedPromo] = useState(null);
+
+  // Auto-apply promo code if passed from another screen
+  useEffect(() => {
+    if (route.params?.promoCode) {
+      setPromoCode(route.params.promoCode);
+      // Automatically apply the promo code
+      handleApplyPromoCode(route.params.promoCode);
+    }
+  }, [route.params?.promoCode]);
+
+  // Add this helper function to apply a promo code programmatically
+  const handleApplyPromoCode = async (code) => {
+    if (!code) return;
+    
+    try {
+      const response = await axios.get(`${API_URL}/promotions/validate/${code.trim().toUpperCase()}`);
+      
+      if (response.data.valid) {
+        const promoDiscount = (subTotal * response.data.promotion.discountPercent) / 100;
+        setDiscount(promoDiscount);
+        setAppliedPromo(response.data.promotion);
+        Alert.alert('Success', `Promo code ${code} applied! You saved $${promoDiscount.toFixed(2)}`);
+      } else {
+        Alert.alert('Invalid Code', response.data.message || 'This promo code is invalid or expired');
+      }
+    } catch (error) {
+      console.error('Error applying promo code:', error);
+      Alert.alert('Error', 'Failed to apply promo code');
+    }
+  };
+
   // Calculate totals when cart changes
   useEffect(() => {
     let sum = 0;
