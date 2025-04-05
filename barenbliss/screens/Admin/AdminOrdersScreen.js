@@ -149,7 +149,7 @@ const AdminOrdersScreen = ({ navigation }) => {
   };
 
   const StatusUpdateModal = () => {
-    const statusOptions = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    const statusOptions = ['pending', 'processing', 'shipped', 'delivered'];
     
     return (
       <Modal

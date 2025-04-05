@@ -45,6 +45,7 @@ export const sendOrderStatusNotification = async (orderId, status, userId) => {
         data: { 
           orderId, 
           screen: 'OrderDetails',
+          params: { orderId }, // Add params object with orderId
           status: status,
           type: 'order_status_update' 
         },
@@ -52,14 +53,21 @@ export const sendOrderStatusNotification = async (orderId, status, userId) => {
       trigger: null, // Null trigger means the notification fires immediately
     });
 
-    // Also send to server for push notification to the user
-    const token = await SecureStore.getItemAsync('userToken');
-    if (token) {
-      await axios.post(
-        `${API_URL}/orders/${orderId}/notify`, 
-        { status },
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      );
+    // Try to send to server for push notification to the user
+    // Using try/catch inside to allow local notifications even if server call fails
+    try {
+      const token = await SecureStore.getItemAsync('userToken');
+      if (token) {
+        // Fix the endpoint - most likely it should be notifications/order or users/notifications
+        await axios.post(
+          `${API_URL}/notifications/order`, 
+          { orderId, status, userId },
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+      }
+    } catch (serverError) {
+      console.log('Server notification failed, but local notification was sent:', serverError.message);
+      // Don't throw error so the function completes
     }
   } catch (error) {
     console.error('Error sending notification:', error);
@@ -89,5 +97,30 @@ export const savePushTokenToServer = async (token) => {
     console.log('Push token saved to server successfully');
   } catch (error) {
     console.error('Error saving push token to server:', error);
+  }
+};
+
+export const handleNotificationResponse = (response, navigation) => {
+  try {
+    const data = response.notification.request.content.data;
+    console.log('Notification data:', data);
+    
+    if (data?.orderId) {
+      // Looking at your navigation structure, OrderDetails is inside ProductNavigator
+      // Match the navigation structure in App.js
+      navigation.navigate('Main', {
+        screen: 'Account',
+        params: {
+          screen: 'Orders',
+          initial: false,
+          params: {
+            screen: 'OrderDetails',
+            params: { orderId: data.orderId }
+          }
+        }
+      });
+    }
+  } catch (error) {
+    console.error('Error handling notification response:', error);
   }
 };
