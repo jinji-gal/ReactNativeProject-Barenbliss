@@ -4,7 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 import { getUserCart, updateCartItem, removeCartItem, clearCart as clearCartAPI } from '../../utils/api';
 
 // Update this to your server's IP/domain
-const API_URL = "http://192.168.100.194:3000/api";
+const API_URL = "http://192.168.100.170:3000/api";
 
 // Get all products
 export const getProducts = async () => {
@@ -239,11 +239,12 @@ export const fetchUserCart = async () => {
       throw new Error('No auth token found');
     }
 
-    const response = await axios.get(`${API_URL}/cart`, {
+    // The URL should be /carts (with an 's') to match your backend route
+    const response = await axios.get(`${API_URL}/carts`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
-    return { success: true, cart: response.data };
+    return { success: true, cart: response.data.items };
   } catch (error) {
     console.error('Error fetching cart:', error);
     return { success: false, message: error.message };

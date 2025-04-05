@@ -64,7 +64,7 @@ async function registerForPushNotificationsAsync() {
       name: 'default',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#e89dae',
+      lightColor: '#4a6da7',
     });
   }
 
@@ -154,12 +154,12 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="Login" 
             component={LoginScreen} 
-            options={{ title: 'barenbliss - Login', headerShown: false }}
+            options={{ title: 'ChairUp - Login' }}
           />
           <Stack.Screen 
             name="Register" 
             component={RegisterScreen} 
-            options={{ title: 'barenbliss - Register', headerShown: false }}
+            options={{ title: 'ChairUp - Register' }}
           />
         </>
       ) : (
@@ -193,19 +193,27 @@ export default function App() {
     // This listener handles when a user taps on a notification
     responseListener.current = Notifications.addNotificationResponseReceivedListener(
       response => {
-        const { orderId } = response.notification.request.content.data;
+        const data = response.notification.request.content.data;
         
-        // Navigate to the OrderDetails screen
-        // This assumes you have a ref to your navigation
-        if (orderId && navigationRef.current) {
-          // For customers
+        if (data.orderId) {
+          // Navigate to order details (existing code)
           navigationRef.current.navigate('ProductNavigator', {
             screen: 'OrderDetails',
-            params: { orderId }
+            params: { orderId: data.orderId }
           });
-          
-          // If the user is admin, you might need different navigation
-          // You could check user role here and navigate accordingly
+        } 
+        else if (data.promotionId) {
+          // Correctly navigate through the nested structure
+          navigationRef.current.navigate('Main', {
+            screen: 'ProductNavigator',
+            params: {
+              screen: 'Home',
+              params: { 
+                promoCode: data.code,
+                showPromoModal: true
+              }
+            }
+          });
         }
       }
     );

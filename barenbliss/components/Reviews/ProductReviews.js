@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.100.194:3000"; // Use your server IP here
+const BASE_URL = "http://192.168.100.170:3000"; // Use your server IP here
 
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { 

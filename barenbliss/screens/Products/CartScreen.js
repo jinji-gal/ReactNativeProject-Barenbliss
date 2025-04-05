@@ -15,8 +15,8 @@ import { syncCartItem, deleteCartItem, clearServerCart, fetchUserCart } from '..
 import * as SecureStore from 'expo-secure-store';
 import styles from './styles/CartScreen.styles';
 
-const API_URL = "http://192.168.100.194:3000/api";
-const BASE_URL = "http://192.168.100.194:3000"; // Base URL without /api
+const API_URL = "http://192.168.100.170:3000/api";
+const BASE_URL = "http://192.168.100.170:3000"; // Base URL without /api
 
 const CartScreen = ({ navigation }) => {
   const { stateProducts, dispatch } = useContext(ProductContext);
@@ -61,13 +61,13 @@ const CartScreen = ({ navigation }) => {
     }
   }, [isFocused]);
   
-  // Function to refresh cart data from server
+  // Improve the refreshCartData function
   const refreshCartData = async () => {
     try {
-      console.log("Explicitly fetching fresh cart data from server...");
+      console.log("Fetching fresh cart data from server...");
       const result = await fetchUserCart();
       
-      if (result.success) {
+      if (result && result.success && result.cart) {
         console.log(`Loaded ${result.cart.length} cart items for current user`);
         
         // Update cart in global state
@@ -75,11 +75,19 @@ const CartScreen = ({ navigation }) => {
           type: 'SET_CART',
           payload: result.cart
         });
+      } else if (result && !result.success) {
+        console.warn("Failed to refresh cart:", result.message);
+        
+        // If we get a 404, keep existing cart rather than replacing with empty
+        if (result.message?.includes('404')) {
+          console.log("Cart endpoint not found. Keeping existing cart.");
+        }
       } else {
-        console.error("Failed to refresh cart:", result.message);
+        console.log("No result from fetchUserCart, keeping existing cart");
       }
     } catch (error) {
       console.error("Error refreshing cart:", error);
+      // Don't clear cart on errors - keep existing state
     }
   };
   
