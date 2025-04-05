@@ -2,8 +2,9 @@ import * as SecureStore from 'expo-secure-store';
 import { Alert } from "react-native";
 import axios from 'axios';
 
+
 // Update this to your server's IP/domain - use your computer's IP on the same network
-const API_URL = "http://192.168.100.194:3000/api";
+const API_URL = "http://192.168.100.170:3000/api";
 
 export const SET_CURRENT_USER = "SET_CURRENT_USER";
 
@@ -99,7 +100,6 @@ export const registerUser = async (userData) => {
 
 export const logoutUser = async (dispatch) => {
   try {
-    // Get current user data before logout
     const userData = await SecureStore.getItemAsync('userData');
     const token = await SecureStore.getItemAsync('userToken');
     
@@ -120,6 +120,15 @@ export const logoutUser = async (dispatch) => {
         console.error("Error clearing push token:", err);
       }
     }
+
+    // Handle Google Sign-Out
+    // try {
+    //   await GoogleSignin.revokeAccess();
+    //   await GoogleSignin.signOut();
+    //   console.log("Google Sign-Out successful");
+    // } catch (err) {
+    //   console.error("Error during Google Sign-Out:", err);
+    // }
     
     // Clear local storage
     await SecureStore.deleteItemAsync("userToken");
@@ -134,60 +143,13 @@ export const logoutUser = async (dispatch) => {
       }
     });
     
-    // Clear cart state ONLY LOCALLY (not on server)
+    // Clear cart state ONLY LOCALLY
     dispatch({
       type: 'CLEAR_CART'
     });
     
-    console.log("Logged out: Cart preserved on server but cleared locally");
+    console.log("Logged out successfully");
   } catch (error) {
     console.error("Error during logout:", error);
-  }
-};
-
-export const updateProfile = async (userData, dispatch) => {
-  try {
-    const formData = new FormData();
-    
-    if (userData.profileImage) {
-      // Handle image file
-      const imageInfo = {
-        uri: userData.profileImage,
-        type: 'image/jpeg',
-        name: 'profile-image.jpg',
-      };
-      formData.append('profileImage', imageInfo);
-    }
-    
-    // Append other user data
-    Object.keys(userData).forEach(key => {
-      if (key !== 'profileImage') {
-        formData.append(key, userData[key]);
-      }
-    });
-
-    const response = await axios.put(
-      `${API_URL}/users/profile`,
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${userData.token}`
-        }
-      }
-    );
-
-    if (response.data) {
-      await AsyncStorage.setItem('userData', JSON.stringify(response.data));
-      dispatch({
-        type: 'UPDATE_PROFILE',
-        payload: response.data
-      });
-      return true;
-    }
-    return false;
-  } catch (error) {
-    console.error('Error updating profile:', error);
-    return false;
   }
 };

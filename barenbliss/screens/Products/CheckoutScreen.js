@@ -19,7 +19,7 @@ import { clearCart } from '../../redux/slices/cartSlice';
 import { clearServerCart } from '../../Context/Actions/Product.actions';
 import styles from './styles/CheckoutScreen.styles';
 
-const API_URL = "http://192.168.100.194:3000/api"; // Update with your server IP
+const API_URL = "http://192.168.100.170:3000/api"; // Update with your server IP
 
 const CheckoutScreen = ({ navigation }) => {
   const dispatch = useDispatch();

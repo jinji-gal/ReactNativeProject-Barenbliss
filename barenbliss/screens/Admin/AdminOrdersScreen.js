@@ -14,7 +14,7 @@ import * as SecureStore from 'expo-secure-store';
 import moment from 'moment';
 import { sendOrderStatusNotification } from '../../utils/notifications';
 
-const API_URL = "http://192.168.100.194:3000/api"; // Update with your server IP
+const API_URL = "http://192.168.100.170:3000/api"; // Update with your server IP
 
 const AdminOrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
