@@ -4,7 +4,7 @@ import axios from 'axios';
 
 
 // Update this to your server's IP/domain - use your computer's IP on the same network
-const API_URL = "http://192.168.100.170:3000/api";
+const API_URL = "http://192.168.100.194:3000/api";
 
 export const SET_CURRENT_USER = "SET_CURRENT_USER";
 

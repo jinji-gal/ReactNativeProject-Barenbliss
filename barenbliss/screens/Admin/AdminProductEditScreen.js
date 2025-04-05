@@ -17,7 +17,7 @@ import * as ImagePicker from 'expo-image-picker';
 import API from '../../utils/api';
 
 // Product categories
-const categories = ['Face', 'Gaming', 'Lip', 'Eye', 'Makeup Tools'];
+const categories = ['Face', 'Lip', 'Eye', 'Makeup Tools'];
 
 const AdminProductEditScreen = ({ route, navigation }) => {
   const { product } = route.params || {};

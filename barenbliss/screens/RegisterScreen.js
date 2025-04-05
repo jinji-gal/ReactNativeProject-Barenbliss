@@ -24,7 +24,7 @@ import Input from './Shared/Input';
 import { registerUser } from '../Context/Actions/Auth.actions';
 
 // Add this line to define API_URL
-const API_URL = "http://192.168.100.170:3000/api";
+const API_URL = "http://192.168.100.194:3000/api";
 
 var { width } = Dimensions.get("window");
 

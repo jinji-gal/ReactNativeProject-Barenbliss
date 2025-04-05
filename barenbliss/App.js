@@ -154,12 +154,12 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="Login" 
             component={LoginScreen} 
-            options={{ title: 'ChairUp - Login' }}
+            options={{ title: 'Login', headerShown: false }}
           />
           <Stack.Screen 
             name="Register" 
             component={RegisterScreen} 
-            options={{ title: 'ChairUp - Register' }}
+            options={{ title: 'Register', headerShown: false }}
           />
         </>
       ) : (

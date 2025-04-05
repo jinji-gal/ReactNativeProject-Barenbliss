@@ -6,7 +6,7 @@ import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 
-const API_URL = "http://192.168.100.170:3000/api";
+const API_URL = "http://192.168.100.194:3000/api";
 
 // Register for WebBrowser redirect
 WebBrowser.maybeCompleteAuthSession();

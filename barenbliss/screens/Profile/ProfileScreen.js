@@ -20,8 +20,8 @@ import { logoutUser } from '../../Context/Actions/Auth.actions';
 import Input from '../Shared/Input';
 import styles from './styles/ProfileScreen.styles';
 
-const API_URL = "http://192.168.100.170:3000/api";
-const BASE_URL = "http://192.168.100.170:3000"; // Add BASE_URL for images
+const API_URL = "http://192.168.100.194:3000/api";
+const BASE_URL = "http://192.168.100.194:3000"; // Add BASE_URL for images
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -74,7 +74,22 @@ const ProfileScreen = () => {
   };
 
   const handleLogout = () => {
-    logoutUser(dispatch);
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: () => logoutUser(dispatch)
+        }
+      ],
+      { cancelable: false }
+    );
   };
 
   const toggleEdit = () => {
@@ -296,11 +311,12 @@ const ProfileScreen = () => {
       </View>
       
       <TouchableOpacity 
-          style={[styles.button, styles.logoutButton]} 
-          onPress={handleLogout}
-        >
-          <Text style={styles.buttonText}>Logout</Text>
-        </TouchableOpacity>
+        style={[styles.button, styles.logoutButton]} 
+        onPress={handleLogout}
+      >
+        <Ionicons name="log-out-outline" size={15} color="#fff" />
+       
+      </TouchableOpacity>
 
       {showImageModal && (
         <Modal

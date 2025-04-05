@@ -9,7 +9,8 @@ import {
   SafeAreaView,
   StatusBar,
   FlatList,
-  ScrollView
+  ScrollView,
+  ActivityIndicator
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../Context/Store/AuthGlobal';
@@ -18,13 +19,19 @@ import Swiper from 'react-native-swiper';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
 
-const API_URL = "http://192.168.100.170:3000/api"; // Update with your server IP
+const API_URL = "http://192.168.100.194:3000/api"; // Update with your server IP
+const BASE_URL = "http://192.168.100.194:3000";
+const categories = ['Face', 'Lip', 'Eye', 'Makeup Tools'];
 
 const HomeScreen = ({ navigation, route }) => {
   const [userData, setUserData] = useState(null);
   const { dispatch } = useContext(AuthContext);
   const [activePromotions, setActivePromotions] = useState([]);
   const [loadingPromotions, setLoadingPromotions] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   
   // Check if we have a promo code passed from notifications
   useEffect(() => {
@@ -52,6 +59,7 @@ const HomeScreen = ({ navigation, route }) => {
     
     getUserData();
     fetchActivePromotions();
+    fetchProducts();
   }, []);
   
   const fetchActivePromotions = async () => {
@@ -67,72 +75,67 @@ const HomeScreen = ({ navigation, route }) => {
     }
   };
 
+  const fetchProducts = async () => {
+    try {
+      setLoadingProducts(true);
+      const response = await axios.get(`${API_URL}/products?featured=true`);
+      setProducts(response.data);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedCategory) {
+      const filtered = products.filter(product => product.category === selectedCategory);
+      setFilteredProducts(filtered);
+    } else {
+      setFilteredProducts(products);
+    }
+  }, [selectedCategory, products]);
+
   const handleLogout = () => {
     logoutUser(dispatch);
   };
 
-  const barenblissData = [
-    {
-      id: '1',
-      name: 'Modern Face Chair',
-      price: 11300, // Converted to PHP
-      image: require('../assets/logo.png'), // Local asset
-      description: 'Ergonomic design with lumbar support for all-day comfort'
-    },
-    {
-      id: '2',
-      name: 'Classic Wooden Chair',
-      price: 8500, // Converted to PHP
-      image: require('../assets/logo.png'), // Local asset
-      description: 'Timeless wooden design that fits any decor'
-    },
-    {
-      id: '3',
-      name: 'Lounge Chair',
-      price: 17000, // Converted to PHP
-      image: require('../assets/logo.png'), // Local asset
-      description: 'Perfect for relaxation with premium cushioning'
-    },
-    {
-      id: '4',
-      name: 'Eye Chair Set',
-      price: 22700, // Converted to PHP
-      image: require('../assets/logo.png'), // Local asset
-      description: 'Set of 4 elegant Eye chairs with sturdy construction'
-    },
-    {
-      id: '5',
-      name: 'Sample Chair 5',
-      price: 14200, // Converted to PHP
-      image: require('../assets/logo.png'), // Local asset
-      description: 'Another great chair for your collection'
-    },
-    {
-      id: '6',
-      name: 'Sample Chair 6',
-      price: 10200, // Converted to PHP
-      image: require('../assets/logo.png'), // Local asset
-      description: 'A stylish chair to enhance your living space'
-    },
-  ];
-
-  const renderbarenblissItem = ({ item }) => (
+  const renderProductItem = ({ item }) => (
     <View style={styles.productItemContainer}>
-      <TouchableOpacity style={styles.barenblissItem}>
+      <TouchableOpacity 
+        style={styles.productItem}
+        onPress={() => navigation.navigate('ProductNavigator', {
+          screen: 'Products',
+          params: { productId: item._id }
+        })}
+      >
         <Image
-          source={item.image} // Use local asset
-          style={styles.barenblissImage}
+          source={{ 
+            uri: item.image?.startsWith('/uploads/') 
+              ? `${BASE_URL}${item.image}` 
+              : item.image 
+          }}
+          style={styles.productImage}
         />
-        <View style={styles.heartIconContainer}>
-          <FontAwesome name="heart-o" size={24} color="#e89dae" />
-        </View>
-        <View style={styles.barenblissInfo}>
-          <Text style={styles.barenblissName}>{item.name}</Text>
-          <Text style={styles.barenblissPrice}>₱{item.price}</Text>
-          <Text style={styles.barenblissDescription} numberOfLines={2}>
+       
+        <View style={styles.productInfo}>
+          <Text style={styles.productName} numberOfLines={2}>{item.name}</Text>
+          <Text style={styles.productPrice}>₱{item.price?.toFixed(2)}</Text>
+          <Text style={styles.productDescription} numberOfLines={2}>
             {item.description}
           </Text>
         </View>
+        
+        {/* Add the new Add to Cart button */}
+        <TouchableOpacity 
+          style={styles.usePromoButton}
+          onPress={() => navigation.navigate('ProductNavigator', {
+            screen: 'Products',
+            params: { productId: item._id }
+          })}
+        >
+          <Text style={styles.usePromoButtonText}>Add to Cart</Text>
+        </TouchableOpacity>
       </TouchableOpacity>
     </View>
   );
@@ -221,20 +224,41 @@ const HomeScreen = ({ navigation, route }) => {
       </Swiper>
      
       <View style={styles.categoryContainer}>
-        <View style={styles.categories}>
-          <TouchableOpacity style={styles.categoryItem}>
-            <Text style={styles.categoryText}>Face</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.categoryItem}>
-            <Text style={styles.categoryText}>Lip</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.categoryItem}>
-            <Text style={styles.categoryText}>Eye</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.categoryItem}>
-            <Text style={styles.categoryText}>Makeup Tools</Text>
-          </TouchableOpacity>
-        </View>
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+        >
+          <View style={styles.categories}>
+            <TouchableOpacity 
+              key="all"
+              style={[
+                styles.categoryItem,
+                !selectedCategory && styles.selectedCategory
+              ]}
+              onPress={() => setSelectedCategory(null)}
+            >
+              <Text style={[
+                styles.categoryText,
+                !selectedCategory && styles.selectedCategoryText
+              ]}>All</Text>
+            </TouchableOpacity>
+            {categories.map(category => (
+              <TouchableOpacity 
+                key={category}
+                style={[
+                  styles.categoryItem,
+                  selectedCategory === category && styles.selectedCategory
+                ]}
+                onPress={() => setSelectedCategory(category)}
+              >
+                <Text style={[
+                  styles.categoryText,
+                  selectedCategory === category && styles.selectedCategoryText
+                ]}>{category}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
       </View>
 
       {renderPromotions()}
@@ -265,12 +289,21 @@ const HomeScreen = ({ navigation, route }) => {
       <FlatList
         key="flatlist-2-columns"
         ListHeaderComponent={renderHeader}
-        data={barenblissData}
-        renderItem={renderbarenblissItem}
-        keyExtractor={item => item.id}
+        data={filteredProducts}
+        renderItem={renderProductItem}
+        keyExtractor={item => item._id}
         showsVerticalScrollIndicator={false}
         numColumns={2}
         contentContainerStyle={styles.flatListContent}
+        ListEmptyComponent={
+          loadingProducts ? (
+            <ActivityIndicator size="large" color="#e89dae" style={styles.loader} />
+          ) : (
+            <Text style={styles.noProductsText}>
+              {selectedCategory ? `No products in ${selectedCategory}` : 'No products available'}
+            </Text>
+          )
+        }
       />
     </SafeAreaView>
   );
@@ -298,7 +331,7 @@ const styles = StyleSheet.create({
   },
   categoryContainer: {
     padding: 20,
-    marginBottom: 10,
+    marginBottom: -10,
     borderRadius: 10,
   },
   sectionTitle: {
@@ -310,19 +343,27 @@ const styles = StyleSheet.create({
   },
   categories: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    paddingHorizontal: 10,
   },
   categoryItem: {
     backgroundColor: '#e89dae',
     paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     borderRadius: 25,
-    alignItems: 'center',
+    marginHorizontal: 5,
   },
   categoryText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  selectedCategory: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e89dae',
+  },
+  selectedCategoryText: {
+    color: '#e89dae',
   },
   productContainer: {
     flex: 1,
@@ -409,12 +450,7 @@ const styles = StyleSheet.create({
     width: '50%',
     padding: 5,
   },
-  heartIconContainer: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 1,
-  },
+
   promotionsContainer: {
     marginVertical: 15,
     paddingHorizontal: 5,
@@ -471,13 +507,54 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 20,
     alignItems: 'center',
-    marginTop: 5,
+    marginTop: 10,
+    marginHorizontal: 5,
   },
   usePromoButtonText: {
     color: '#e89dae',
     fontWeight: 'bold',
     fontSize: 14,
   },
+  productItem: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+    margin: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  productImage: {
+    width: '100%',
+    height: 150,
+    borderRadius: 8,
+    resizeMode: 'cover',
+  },
+  productInfo: {
+    padding: 10,
+    flex: 1, // This will push the button to the bottom
+  },
+  productName: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  productPrice: {
+    color: '#e89dae',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  loader: {
+    marginTop: 20,
+  },
+  noProductsText: {
+    textAlign: 'center',
+    color: '#666',
+    marginTop: 20,
+  }
 });
 
 export default HomeScreen;

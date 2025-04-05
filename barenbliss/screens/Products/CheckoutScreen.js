@@ -19,7 +19,7 @@ import { clearCart } from '../../redux/slices/cartSlice';
 import { clearServerCart } from '../../Context/Actions/Product.actions';
 import styles from './styles/CheckoutScreen.styles';
 
-const API_URL = "http://192.168.100.170:3000/api"; // Update with your server IP
+const API_URL = "http://192.168.100.194:3000/api"; // Update with your server IP
 
 const CheckoutScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
@@ -60,7 +60,7 @@ const CheckoutScreen = ({ navigation, route }) => {
         const promoDiscount = (subTotal * response.data.promotion.discountPercent) / 100;
         setDiscount(promoDiscount);
         setAppliedPromo(response.data.promotion);
-        Alert.alert('Success', `Promo code ${code} applied! You saved $${promoDiscount.toFixed(2)}`);
+        Alert.alert('Success', `Promo code ${code} applied! You saved ₱${promoDiscount.toFixed(2)}`);
       } else {
         Alert.alert('Invalid Code', response.data.message || 'This promo code is invalid or expired');
       }
@@ -119,7 +119,7 @@ const CheckoutScreen = ({ navigation, route }) => {
         const promoDiscount = (subTotal * response.data.promotion.discountPercent) / 100;
         setDiscount(promoDiscount);
         setAppliedPromo(response.data.promotion);
-        Alert.alert('Success', `Promo code applied! You saved $${promoDiscount.toFixed(2)}`);
+        Alert.alert('Success', `Promo code applied! You saved ₱${promoDiscount.toFixed(2)}`);
       } else {
         Alert.alert('Invalid Code', response.data.message || 'This promo code is invalid or expired');
       }
@@ -383,26 +383,26 @@ const CheckoutScreen = ({ navigation, route }) => {
 
           <View style={styles.orderSummaryItem}>
             <Text style={styles.orderSummaryLabel}>Subtotal</Text>
-            <Text style={styles.orderSummaryValue}>${subTotal.toFixed(2)}</Text>
+            <Text style={styles.orderSummaryValue}>₱{subTotal.toFixed(2)}</Text>
           </View>
           
           {discount > 0 && (
              <View style={styles.orderSummaryItem}>
                <Text style={[styles.orderSummaryLabel, {color: '#4CAF50'}]}>Discount</Text>
-               <Text style={[styles.orderSummaryValue, {color: '#4CAF50'}]}>-${discount.toFixed(2)}</Text>
+               <Text style={[styles.orderSummaryValue, {color: '#4CAF50'}]}>-₱{discount.toFixed(2)}</Text>
              </View>
            )}
 
           <View style={styles.orderSummaryItem}>
             <Text style={styles.orderSummaryLabel}>Shipping</Text>
-            <Text style={styles.orderSummaryValue}>${shippingCost.toFixed(2)}</Text>
+            <Text style={styles.orderSummaryValue}>₱{shippingCost.toFixed(2)}</Text>
           </View>
           
           <View style={styles.divider} />
           
           <View style={styles.orderSummaryItem}>
             <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>${total.toFixed(2)}</Text>
+            <Text style={styles.totalValue}>₱{total.toFixed(2)}</Text>
           </View>
         </View>
       </ScrollView>

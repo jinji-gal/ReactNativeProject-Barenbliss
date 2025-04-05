@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 3,
+    borderColor: '#e89dae', 
   },
   changeImageButton: {
     position: 'absolute',
@@ -27,7 +28,7 @@ const styles = StyleSheet.create({
     right: 200,
     backgroundColor: '#e89dae',
     borderWidth: 2,           // Add border width
-    borderColor: '#000000', 
+    borderColor: '#e89dae', 
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -40,7 +41,7 @@ const styles = StyleSheet.create({
   },
   userEmail: {
     fontSize: 16,
-    color: '#ffffff',
+    color: '#000000',
     marginTop: 5,
   },
   infoContainer: {
@@ -121,29 +122,32 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: '#e89dae',
+    width: 40,
+    height: 40,
+    borderRadius: 30,
     justifyContent: 'center',
-    backgroundColor: '#f8f8f8',
-    borderRadius: 20,
-    padding: 15,
-    marginVertical: 10,
-    marginHorizontal: 15,
-    marginTop: -5,
+    alignItems: 'center',
+    zIndex: 1,
+    elevation: 5,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
+  
   // Update buttonText style
   buttonText: {
     fontSize: 16,
     fontWeight: '500',
     marginLeft: 10,
+    color: '#000000'
   },
   ordersSection: {
     marginTop: 10,

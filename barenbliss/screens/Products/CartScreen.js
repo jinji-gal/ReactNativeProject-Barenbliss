@@ -15,8 +15,8 @@ import { syncCartItem, deleteCartItem, clearServerCart, fetchUserCart } from '..
 import * as SecureStore from 'expo-secure-store';
 import styles from './styles/CartScreen.styles';
 
-const API_URL = "http://192.168.100.170:3000/api";
-const BASE_URL = "http://192.168.100.170:3000"; // Base URL without /api
+const API_URL = "http://192.168.100.194:3000/api";
+const BASE_URL = "http://192.168.100.194:3000"; // Base URL without /api
 
 const CartScreen = ({ navigation }) => {
   const { stateProducts, dispatch } = useContext(ProductContext);

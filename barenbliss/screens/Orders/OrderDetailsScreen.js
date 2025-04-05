@@ -14,8 +14,8 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import moment from 'moment';
 
-const API_URL = "http://192.168.100.170:3000/api"; // Update with your server IP
-const BASE_URL = "http://192.168.100.170:3000"; // Base URL without /api
+const API_URL = "http://192.168.100.194:3000/api"; // Update with your server IP
+const BASE_URL = "http://192.168.100.194:3000"; // Base URL without /api
 
 const OrderDetailsScreen = ({ route, navigation }) => {
   const { orderId } = route.params;
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 15,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffe5ec',
     borderBottomWidth: 1,
     borderBottomColor: '#eee'
   },
