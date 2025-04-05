@@ -5,7 +5,7 @@ import AdminProductsScreen from '../screens/Admin/AdminProductsScreen';
 import AdminProductEditScreen from '../screens/Admin/AdminProductEditScreen';
 import AdminOrdersScreen from '../screens/Admin/AdminOrdersScreen';
 import AdminOrderDetailsScreen from '../screens/Admin/AdminOrderDetailsScreen';
-
+import AdminPromotionsScreen from '../screens/Admin/AdminPromotionsScreen';
 const Stack = createStackNavigator();
 
 const AdminNavigator = () => {
@@ -38,6 +38,11 @@ const AdminNavigator = () => {
         component={AdminOrderDetailsScreen}
         options={{ title: 'Order Details' }}
       />
+       <Stack.Screen 
+         name="AdminPromotions" 
+         component={AdminPromotionsScreen}
+         options={{ title: 'Promotion Management' }}
+       />
     </Stack.Navigator>
   );
 };
