@@ -170,6 +170,54 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
+  promoSection: {
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    paddingBottom: 15
+  },
+  promoInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10
+  },
+  promoInput: {
+    backgroundColor: '#f9f9f9',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 16,
+    flex: 1
+  },
+  applyButton: {
+    backgroundColor: '#e89dae',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    marginLeft: 10,
+    minWidth: 80,
+    alignItems: 'center'
+  },
+  applyButtonText: {
+    color: '#fff',
+    fontWeight: 'bold'
+  },
+  appliedPromoTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 15,
+    alignSelf: 'flex-start'
+  },
+  appliedPromoText: {
+    color: '#4CAF50',
+    marginLeft: 6,
+    fontWeight: '600',
+    fontSize: 14
+  },
 });
 
 export default styles;

@@ -37,6 +37,19 @@ const AdminDashboardScreen = () => {
         </View>
         <Ionicons name="chevron-forward" size={24} color="#ccc" />
       </TouchableOpacity>
+      <TouchableOpacity 
+           style={styles.menuItem}
+           onPress={() => navigation.navigate('AdminPromotions')}
+         >
+           <View style={[styles.iconContainer, {backgroundColor: '#D7A86E'}]}>
+             <Ionicons name="pricetag-outline" size={24} color="#fff" />
+           </View>
+           <View style={styles.menuContent}>
+             <Text style={styles.menuTitle}>Promotion Management</Text>
+             <Text style={styles.menuDescription}>Create and manage discount codes</Text>
+           </View>
+           <Ionicons name="chevron-forward" size={24} color="#E6D5B8" />
+         </TouchableOpacity>
     </View>
   );
 };

@@ -8,17 +8,35 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  FlatList // Import FlatList
+  FlatList,
+  ScrollView
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContext } from '../Context/Store/AuthGlobal';
 import { logoutUser } from '../Context/Actions/Auth.actions';
-import Swiper from 'react-native-swiper'; // Import Swiper
-import { FontAwesome } from '@expo/vector-icons'; // Import FontAwesome
+import Swiper from 'react-native-swiper';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
+import axios from 'axios';
 
-const HomeScreen = () => {
+const API_URL = "http://192.168.100.170:3000/api"; // Update with your server IP
+
+const HomeScreen = ({ navigation, route }) => {
   const [userData, setUserData] = useState(null);
   const { dispatch } = useContext(AuthContext);
+  const [activePromotions, setActivePromotions] = useState([]);
+  const [loadingPromotions, setLoadingPromotions] = useState(false);
+  
+  // Check if we have a promo code passed from notifications
+  useEffect(() => {
+    if (route.params?.promoCode && route.params?.showPromoModal) {
+      // Display the promo code notification
+      Alert.alert(
+        "New Promotion Available!",
+        `Use code ${route.params.promoCode} for your next purchase`,
+        [{ text: "OK", onPress: () => navigation.setParams({ showPromoModal: false }) }]
+      );
+    }
+  }, [route.params?.promoCode, route.params?.showPromoModal]);
  
   useEffect(() => {
     const getUserData = async () => {
@@ -31,9 +49,23 @@ const HomeScreen = () => {
         console.log('Failed to fetch user data', e);
       }
     };
-   
+    
     getUserData();
+    fetchActivePromotions();
   }, []);
+  
+  const fetchActivePromotions = async () => {
+    try {
+      setLoadingPromotions(true);
+      const response = await axios.get(`${API_URL}/promotions?active=true`);
+      setActivePromotions(response.data);
+      console.log('Active promotions loaded:', response.data.length);
+    } catch (error) {
+      console.error('Error fetching promotions:', error);
+    } finally {
+      setLoadingPromotions(false);
+    }
+  };
 
   const handleLogout = () => {
     logoutUser(dispatch);
@@ -105,38 +137,84 @@ const HomeScreen = () => {
     </View>
   );
 
+  const renderPromotions = () => {
+    if (activePromotions.length === 0) {
+      return null;
+    }
+    
+    return (
+      <View style={styles.promotionsContainer}>
+        <Text style={styles.sectionTitle}>Active Promotions</Text>
+        <ScrollView 
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.promotionsScroll}
+        >
+          {activePromotions.map(promo => (
+            <View key={promo._id} style={styles.promotionCard}>
+              <View style={styles.promotionHeader}>
+                <Ionicons name="pricetag" size={20} color="#e89dae" />
+                <Text style={styles.promoCode}>{promo.code}</Text>
+              </View>
+              <Text style={styles.promoDiscount}>{promo.discountPercent}% OFF</Text>
+              {promo.expiryDate && (
+                <Text style={styles.promoExpiry}>
+                  Expires: {new Date(promo.expiryDate).toLocaleDateString()}
+                </Text>
+              )}
+              {promo.description && (
+                <Text style={styles.promoDescription} numberOfLines={2}>
+                  {promo.description}
+                </Text>
+              )}
+              <TouchableOpacity 
+                style={styles.usePromoButton}
+                onPress={() => navigation.navigate('ProductNavigator', {
+                  screen: 'Products',
+                  params: { promoCode: promo.code }
+                })}
+              >
+                <Text style={styles.usePromoButtonText}>Shop Now</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
+      </View>
+    );
+  };
+
   const renderHeader = () => (
     <>
       <Swiper
         style={styles.swiper}
-        showsButtons={false} // Hide navigation buttons
-        autoplay={true} // Enable automatic sliding
-        autoplayTimeout={3} // Set the interval to 3 seconds
+        showsButtons={false}
+        autoplay={true}
+        autoplayTimeout={3}
         dotStyle={styles.dot}
         activeDotStyle={styles.activeDot}
-        loop={true} // Ensure the swiper loops
+        loop={true}
       >
         <View style={styles.slide}>
           <Image
-            source={require('../assets/sliding1.png')} // Replace with your image path
+            source={require('../assets/sliding1.png')}
             style={styles.slideImage}
           />
         </View>
         <View style={styles.slide}>
           <Image
-            source={require('../assets/sliding2.png')} // Replace with your image path
+            source={require('../assets/sliding2.png')}
             style={styles.slideImage}
           />
         </View>
         <View style={styles.slide}>
           <Image
-            source={require('../assets/sliding3.png')} // Replace with your image path
+            source={require('../assets/sliding3.png')}
             style={styles.slideImage}
           />
         </View>
         <View style={styles.slide}>
           <Image
-            source={require('../assets/sliding4.png')} // Replace with your image path
+            source={require('../assets/sliding4.png')}
             style={styles.slideImage}
           />
         </View>
@@ -159,6 +237,8 @@ const HomeScreen = () => {
         </View>
       </View>
 
+      {renderPromotions()}
+
       <Text style={styles.sectionTitle}>Featured Products</Text>
     </>
   );
@@ -166,7 +246,6 @@ const HomeScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      {/* Fixed header */}
       <View style={styles.header}>
         <View style={styles.headerLogoContainer}>
           <Image
@@ -183,7 +262,6 @@ const HomeScreen = () => {
           </TouchableOpacity>
         )}
       </View>
-      {/* Scrollable content */}
       <FlatList
         key="flatlist-2-columns"
         ListHeaderComponent={renderHeader}
@@ -211,8 +289,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-    zIndex: 1, // Ensure header stays on top
-    position: 'relative', // Keep header in normal flow
+    zIndex: 1,
+    position: 'relative',
   },
   headerLogoContainer: {
     flexDirection: 'row',
@@ -221,28 +299,28 @@ const styles = StyleSheet.create({
   categoryContainer: {
     padding: 20,
     marginBottom: 10,
-    borderRadius: 10, // Rounded corners
+    borderRadius: 10,
   },
   sectionTitle: {
-    fontSize: 18, // Increased font size
+    fontSize: 18,
     fontWeight: 'normal',
     marginBottom: 15,
-    color: '#e89dae', // Darker color
-    textAlign: 'center', // Center the text
+    color: '#e89dae',
+    textAlign: 'center',
   },
   categories: {
     flexDirection: 'row',
-    justifyContent: 'space-around', // Distribute items evenly
+    justifyContent: 'space-around',
   },
   categoryItem: {
-    backgroundColor: '#e89dae', // Pink background
+    backgroundColor: '#e89dae',
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 25, // More rounded corners
-    alignItems: 'center', // Center text horizontally
+    borderRadius: 25,
+    alignItems: 'center',
   },
   categoryText: {
-    color: '#fff', // White text
+    color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -251,21 +329,20 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#fff',
   },
- 
   logoImage: {
-    width: 180, // Adjusted width
-    height: 35, // Adjusted height
+    width: 180,
+    height: 35,
     marginRight: 100,
   },
   welcomeImage: {
-    width: '100%', // Adjust the width as needed
-    height: 200, // Adjust the height as needed
+    width: '100%',
+    height: 200,
     marginTop: 10,
-    resizeMode: 'cover', // Ensures the image scales properly
+    resizeMode: 'cover',
   },
   swiper: {
-    height: '180', // Adjust the height of the swiper
-    marginBottom: 10, // Add spacing below the swiper
+    height: '180',
+    marginBottom: 10,
   },
   slide: {
     flex: 1,
@@ -293,10 +370,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 3,
   },
   flatListContent: {
-    paddingBottom: 20, // Add padding to the bottom of the FlatList content
+    paddingBottom: 20,
   },
   barenblissItem: {
-    flex: 1, // Make each item take equal space
+    flex: 1,
     padding: 10,
     backgroundColor: '#fff',
     borderRadius: 10,
@@ -329,7 +406,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   productItemContainer: {
-    width: '50%', // Each item takes 50% width to display 2 items per row
+    width: '50%',
     padding: 5,
   },
   heartIconContainer: {
@@ -337,6 +414,69 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     zIndex: 1,
+  },
+  promotionsContainer: {
+    marginVertical: 15,
+    paddingHorizontal: 5,
+  },
+  promotionsScroll: {
+    paddingLeft: 10,
+    paddingRight: 20,
+  },
+  promotionCard: {
+    width: 200,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 15,
+    marginHorizontal: 5,
+    marginVertical: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(232, 157, 174, 0.3)',
+  },
+  promotionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  promoCode: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: '#333',
+    marginLeft: 5,
+  },
+  promoDiscount: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#e89dae',
+    marginVertical: 5,
+  },
+  promoExpiry: {
+    fontSize: 12,
+    color: '#666',
+    marginBottom: 5,
+  },
+  promoDescription: {
+    fontSize: 13,
+    color: '#555',
+    marginBottom: 10,
+  },
+  usePromoButton: {
+    backgroundColor: 'rgba(232, 157, 174, 0.2)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginTop: 5,
+  },
+  usePromoButtonText: {
+    color: '#e89dae',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
 
