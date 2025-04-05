@@ -19,19 +19,38 @@ const AdminNavigator = () => {
       <Stack.Screen 
         name="AdminProducts" 
         component={AdminProductsScreen}
-        options={{ title: 'Product Management' }}
+        options={{ 
+          title: 'Product Management',
+          headerTitleStyle: {
+            color: '#e89dae',
+            fontSize: 22,
+          },
+          headerTintColor: '#e89dae', // This colors the back button
+        }}
       />
       <Stack.Screen 
         name="AdminProductEdit" 
         component={AdminProductEditScreen}
         options={({ route }) => ({ 
-          title: route.params?.product ? 'Edit Product' : 'Add Product' 
+          title: route.params?.product ? 'Edit Product' : 'Add Product',
+          headerTitleStyle: {
+            color: '#e89dae',
+            fontSize: 22,
+          },
+          headerTintColor: '#e89dae', // This colors the back button
         })}
       />
       <Stack.Screen 
         name="AdminOrders" 
         component={AdminOrdersScreen}
-        options={{ title: 'Order Management' }}
+        options={{ 
+          title: 'Order Management',
+          headerTitleStyle: {
+            color: '#e89dae',
+            fontSize: 22,
+          },
+          headerTintColor: '#e89dae', // This colors the back button
+        }}
       />
       <Stack.Screen 
         name="AdminOrderDetails" 
@@ -41,7 +60,14 @@ const AdminNavigator = () => {
        <Stack.Screen 
          name="AdminPromotions" 
          component={AdminPromotionsScreen}
-         options={{ title: 'Promotion Management' }}
+         options={{ 
+          title: 'Promo Management',
+          headerTitleStyle: {
+            color: '#e89dae',
+            fontSize: 22,
+          },
+          headerTintColor: '#e89dae', // This colors the back button
+        }}
        />
     </Stack.Navigator>
   );

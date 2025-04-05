@@ -354,7 +354,7 @@ const AdminPromotionsScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F6F3',
+    backgroundColor: '#ffe5ec', // Match app's pink theme
   },
   loadingContainer: {
     flex: 1,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 10,
     fontSize: 16,
-    color: '#888',
+    color: '#666',
   },
   listContent: {
     padding: 16,
@@ -372,13 +372,13 @@ const styles = StyleSheet.create({
   },
   promoItem: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 15,
     padding: 16,
     marginBottom: 16,
     flexDirection: 'row',
     borderWidth: 1,
-    borderColor: '#E6D5B8',
-    elevation: 2,
+    borderColor: '#e89dae',
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -399,59 +399,63 @@ const styles = StyleSheet.create({
   promoCode: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#333333',
+    color: '#333',
     marginRight: 8,
   },
   activeTag: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#e89dae',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
   activeText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 12,
     fontWeight: '600',
   },
   inactiveTag: {
-    backgroundColor: '#F44336',
+    backgroundColor: '#ff6b6b',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
   inactiveText: {
-    color: 'white',
+    color: '#fff',
     fontSize: 12,
     fontWeight: '600',
   },
   discount: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
-    color: '#D7A86E',
+    color: '#e89dae',
     marginBottom: 8,
   },
   expiryDate: {
     fontSize: 14,
-    color: '#666666',
+    color: '#666',
   },
   actionButtons: {
     justifyContent: 'center',
+    gap: 8,
   },
   editButton: {
     padding: 8,
-    marginBottom: 8,
+    backgroundColor: 'rgba(232, 157, 174, 0.1)',
+    borderRadius: 8,
   },
   deleteButton: {
     padding: 8,
+    backgroundColor: 'rgba(255, 107, 107, 0.1)',
+    borderRadius: 8,
   },
   addButton: {
     position: 'absolute',
     bottom: 24,
     right: 24,
-    backgroundColor: '#333333',
+    backgroundColor: '#e89dae',
     width: 56,
     height: 56,
-    borderRadius: 16,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
@@ -468,17 +472,17 @@ const styles = StyleSheet.create({
     margin: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E6D5B8',
+    borderColor: '#e89dae',
   },
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333333',
+    color: '#333',
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#666666',
+    color: '#666',
     marginTop: 8,
   },
   modalOverlay: {
@@ -489,8 +493,8 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -501,42 +505,42 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
-    color: '#333333',
+    color: '#333',
   },
   formGroup: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   label: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
     marginBottom: 8,
-    color: '#333333',
+    color: '#333',
   },
   input: {
-    backgroundColor: '#F8F6F3',
+    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#E6D5B8',
+    borderColor: '#e89dae',
     borderRadius: 12,
     padding: 12,
-    fontSize: 15,
+    fontSize: 16,
   },
   saveButton: {
-    backgroundColor: '#333333',
+    backgroundColor: '#e89dae',
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 24,
   },
   saveButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-  },
+  }
 });
 
 export default AdminPromotionsScreen;

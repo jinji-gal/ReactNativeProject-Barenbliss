@@ -289,25 +289,25 @@ const ProfileScreen = () => {
           </View>
         )}
 
-        {/* Add My Orders Section */}
-        <View style={styles.ordersSection}>
-          
-          <TouchableOpacity 
-            style={styles.orderButton}
-            onPress={() => navigation.navigate('ProductNavigator', { screen: 'Orders' })}
-          >
-            <View style={styles.orderButtonContent}>
-            <Ionicons name="bag-check-outline" size={24} color="#e89dae" />              
-            <Text style={styles.orderButtonText}>View Purchased History</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={24} color="#ccc" />
-          </TouchableOpacity>
-          
-          <Text style={styles.orderDescription}>
-            Your Digital Orders and Purchases
-          </Text>
-        </View>
-
+        {/* Remove or conditionally render the orders section based on user role */}
+        {!stateUser.user?.isAdmin && (
+          <View style={styles.ordersSection}>
+            <TouchableOpacity 
+              style={styles.orderButton}
+              onPress={() => navigation.navigate('ProductNavigator', { screen: 'Orders' })}
+            >
+              <View style={styles.orderButtonContent}>
+                <Ionicons name="bag-check-outline" size={24} color="#e89dae" />              
+                <Text style={styles.orderButtonText}>View Purchased History</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color="#ccc" />
+            </TouchableOpacity>
+            
+            <Text style={styles.orderDescription}>
+              Your Digital Orders and Purchases
+            </Text>
+          </View>
+        )}
       </View>
       
       <TouchableOpacity 

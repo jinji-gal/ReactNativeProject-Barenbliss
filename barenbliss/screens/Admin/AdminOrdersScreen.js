@@ -6,7 +6,8 @@ import {
   FlatList,
   ActivityIndicator,
   TouchableOpacity,
-  Alert
+  Alert,
+  Modal
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import axios from 'axios';
@@ -20,6 +21,9 @@ const AdminOrdersScreen = ({ navigation }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [statusModalVisible, setStatusModalVisible] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [currentStatus, setCurrentStatus] = useState(null);
   
   useEffect(() => {
     fetchOrders();
@@ -65,25 +69,10 @@ const AdminOrdersScreen = ({ navigation }) => {
     fetchOrders();
   };
   
-  const handleUpdateStatus = async (orderId, currentStatus) => {
-    const statusOptions = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-    
-    // Create buttons for each status except the current one
-    const buttons = statusOptions
-      .filter(status => status !== currentStatus)
-      .map(status => ({
-        text: status.charAt(0).toUpperCase() + status.slice(1),
-        onPress: () => updateOrderStatus(orderId, status)
-      }));
-    
-    // Add cancel button
-    buttons.push({ text: 'Cancel', style: 'cancel' });
-    
-    Alert.alert(
-      'Update Order Status',
-      'Select new status:',
-      buttons
-    );
+  const handleUpdateStatus = (orderId, status) => {
+    setSelectedOrderId(orderId);
+    setCurrentStatus(status);
+    setStatusModalVisible(true);
   };
   
   const updateOrderStatus = async (orderId, newStatus) => {
@@ -145,7 +134,7 @@ const AdminOrdersScreen = ({ navigation }) => {
           </Text>
           
           <View style={styles.footer}>
-            <Text style={styles.totalPrice}>${item.totalPrice?.toFixed(2)}</Text>
+            <Text style={styles.totalPrice}>₱{item.totalPrice?.toFixed(2)}</Text>
             
             <TouchableOpacity 
               style={styles.updateButton}
@@ -156,6 +145,53 @@ const AdminOrdersScreen = ({ navigation }) => {
           </View>
         </View>
       </TouchableOpacity>
+    );
+  };
+
+  const StatusUpdateModal = () => {
+    const statusOptions = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+    
+    return (
+      <Modal
+        visible={statusModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setStatusModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Update Order Status</Text>
+            
+            {statusOptions
+              .filter(status => status !== currentStatus)
+              .map((status, index) => (
+                <TouchableOpacity
+                  key={status}
+                  style={[
+                    styles.statusOption,
+                    index === 0 && styles.statusOptionFirst,
+                    index === statusOptions.length - 2 && styles.statusOptionLast
+                  ]}
+                  onPress={() => {
+                    setStatusModalVisible(false);
+                    updateOrderStatus(selectedOrderId, status);
+                  }}
+                >
+                  <Text style={styles.statusOptionText}>
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => setStatusModalVisible(false)}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     );
   };
 
@@ -182,6 +218,7 @@ const AdminOrdersScreen = ({ navigation }) => {
           }
         />
       )}
+      <StatusUpdateModal />
     </View>
   );
 };
@@ -189,111 +226,204 @@ const AdminOrdersScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#ffe5ec',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#ffe5ec',
   },
   loadingText: {
-    marginTop: 10,
+    marginTop: 12,
     fontSize: 16,
-    color: '#888',
+    color: '#666',
+    fontWeight: '500',
   },
   listContent: {
-    padding: 15,
+    padding: 16,
     paddingBottom: 30,
   },
   orderItem: {
     backgroundColor: '#fff',
-    borderRadius: 10,
-    marginBottom: 15,
-    padding: 15,
+    borderRadius: 15,
+    marginBottom: 16,
+    padding: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: 'rgba(232, 157, 174, 0.2)',
   },
   orderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
   orderId: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#333',
+    letterSpacing: 0.5,
   },
   orderDate: {
     fontSize: 14,
     color: '#666',
-    marginTop: 2,
+    marginTop: 4,
   },
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 15,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    minWidth: 80,
+    alignItems: 'center',
   },
   statusText: {
     color: '#fff',
     fontSize: 12,
     fontWeight: 'bold',
     textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   orderContent: {
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: 'rgba(232, 157, 174, 0.2)',
     paddingTop: 12,
   },
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
+    backgroundColor: 'rgba(232, 157, 174, 0.1)',
+    padding: 8,
+    borderRadius: 8,
   },
   userName: {
-    marginLeft: 6,
-    fontSize: 14,
+    marginLeft: 8,
+    fontSize: 15,
     color: '#333',
+    fontWeight: '500',
   },
   itemsCount: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 10,
+    marginBottom: 12,
+    fontWeight: '500',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 5,
+    marginTop: 8,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(232, 157, 174, 0.1)',
   },
   totalPrice: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#e91e63',
+    color: '#e89dae',
   },
   updateButton: {
     backgroundColor: '#e89dae',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   updateButtonText: {
     color: '#fff',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   emptyContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 60,
+    backgroundColor: '#fff',
+    margin: 16,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(232, 157, 174, 0.2)',
   },
   emptyText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#888',
-    marginTop: 10,
+    color: '#333',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  refreshIndicator: {
+    color: '#e89dae',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingBottom: 30,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 20,
+    paddingBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  statusOption: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  statusOptionFirst: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  statusOptionLast: {
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderBottomWidth: 0,
+  },
+  statusOptionText: {
+    fontSize: 16,
+    color: '#e89dae',
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  cancelButton: {
+    marginTop: 12,
+    padding: 15,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 10,
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    color: '#ff4444',
+    textAlign: 'center',
+    fontWeight: '600',
   }
 });
 

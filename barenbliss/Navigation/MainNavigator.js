@@ -35,39 +35,52 @@ const MainNavigator = () => {
         tabBarInactiveTintColor: 'black',
       })}
     >
-      <Tab.Screen 
-        name="HomeTab" 
-        component={HomeScreen} 
-        options={{ 
-          headerShown: false,
-          title: 'Home'
-        }}
-      />
-      <Tab.Screen 
-        name="ProductNavigator" 
-        component={ProductNavigator} 
-        options={{ 
-          headerShown: false,
-          title: 'Products'
-        }}
-      />
-      <Tab.Screen 
-        name="Profile" 
-        component={ProfileScreen} 
-        options={{ 
-          headerShown: false,
-          title: 'My Profile' 
-        }}
-      />
-      {isAdmin && (
-        <Tab.Screen 
-          name="AdminTab" 
-          component={AdminNavigator} 
-          options={{ 
-            headerShown: false,
-            title: 'aAdmin'
-          }}
-        />
+      {!isAdmin ? (
+        <>
+          <Tab.Screen 
+            name="HomeTab" 
+            component={HomeScreen} 
+            options={{ 
+              headerShown: false,
+              title: 'Home'
+            }}
+          />
+          <Tab.Screen 
+            name="ProductNavigator" 
+            component={ProductNavigator} 
+            options={{ 
+              headerShown: false,
+              title: 'Products'
+            }}
+          />
+          <Tab.Screen 
+            name="Profile" 
+            component={ProfileScreen} 
+            options={{ 
+              headerShown: false,
+              title: 'My Profile' 
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <Tab.Screen 
+            name="AdminTab" 
+            component={AdminNavigator} 
+            options={{ 
+              headerShown: false,
+              title: 'Admin'
+            }}
+          />
+          <Tab.Screen 
+            name="Profile" 
+            component={ProfileScreen} 
+            options={{ 
+              headerShown: false,
+              title: 'My Profile' 
+            }}
+          />
+        </>
       )}
     </Tab.Navigator>
   );
