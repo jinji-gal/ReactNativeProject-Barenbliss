@@ -1,4 +1,5 @@
 const Promotion = require('../models/Promotion');
+const { notifyAllUsersAboutPromotion } = require('../services/notificationService');
 
 // Get all promotions
 exports.getAllPromotions = async (req, res) => {
@@ -60,6 +61,12 @@ exports.createPromotion = async (req, res) => {
     });
     
     const savedPromotion = await promotion.save();
+    
+    // Send notifications to all users about the new promotion
+    if (savedPromotion.active) {
+      notifyAllUsersAboutPromotion(savedPromotion);
+    }
+    
     res.status(201).send(savedPromotion);
   } catch (error) {
     res.status(500).send({ message: error.message });

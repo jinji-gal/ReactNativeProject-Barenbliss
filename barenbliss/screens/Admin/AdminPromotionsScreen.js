@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,18 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import API from '../../utils/api';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import Constants from 'expo-constants';
+
+// Configure notifications
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 const AdminPromotionsScreen = ({ navigation }) => {
   const [promotions, setPromotions] = useState([]);
@@ -21,10 +33,66 @@ const AdminPromotionsScreen = ({ navigation }) => {
   const [discountPercent, setDiscountPercent] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
   const [editingPromo, setEditingPromo] = useState(null);
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   useEffect(() => {
     fetchPromotions();
+    registerForPushNotifications();
+
+    // Cleanup notification listeners
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
   }, []);
+
+  // Register for push notifications
+  async function registerForPushNotifications() {
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      
+      if (finalStatus !== 'granted') {
+        Alert.alert('Failed to get push token for push notification!');
+        return;
+      }
+      
+      const token = (await Notifications.getExpoPushTokenAsync({
+        projectId: Constants.expoConfig?.extra?.eas?.projectId,
+      })).data;
+      setExpoPushToken(token);
+    } else {
+      Alert.alert('Must use physical device for Push Notifications');
+    }
+
+    // Notification listeners
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Notification received:', notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('Notification response:', response);
+    });
+  }
+
+  // Send local notification
+  async function sendPromoNotification(title, body, data = {}) {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: title,
+        body: body,
+        data: data,
+      },
+      trigger: null, // null means send immediately
+    });
+  }
 
   const fetchPromotions = async () => {
     try {
@@ -57,10 +125,27 @@ const AdminPromotionsScreen = ({ navigation }) => {
         // Update existing promotion
         await API.put(`/promotions/${editingPromo._id}`, promoData);
         Alert.alert('Success', 'Promotion updated successfully');
+        
+        // Send notification for updated promotion
+        await sendPromoNotification(
+          'Promotion Updated',
+          `The promotion code ${promoData.code} has been updated with ${promoData.discountPercent}% discount.`,
+          { type: 'promotion_updated', promoCode: promoData.code }
+        );
       } else {
         // Create new promotion
         await API.post('/promotions', promoData);
-        Alert.alert('Success', 'Promotion created successfully');
+        Alert.alert(
+          'Success', 
+          'Promotion created successfully! All users with the app installed will be notified about this new promotion.'
+        );
+        
+        // Send local notification for new promotion
+        await sendPromoNotification(
+          'New Promotion Available!',
+          `Use code ${promoData.code} for ${promoData.discountPercent}% off your next purchase!`,
+          { type: 'promotion_created', promoCode: promoData.code }
+        );
       }
 
       // Reset form and close modal
@@ -88,8 +173,21 @@ const AdminPromotionsScreen = ({ navigation }) => {
 
   const handleDeletePromotion = async (promoId) => {
     try {
+      // Get promotion details before deleting
+      const promoToDelete = promotions.find(p => p._id === promoId);
+      
       await API.delete(`/promotions/${promoId}`);
       Alert.alert('Success', 'Promotion deleted');
+      
+      // Send notification about deleted promotion
+      if (promoToDelete) {
+        await sendPromoNotification(
+          'Promotion Removed',
+          `The promotion code ${promoToDelete.code} is no longer available.`,
+          { type: 'promotion_deleted', promoCode: promoToDelete.code }
+        );
+      }
+      
       fetchPromotions();
     } catch (error) {
       console.error('Error deleting promotion:', error);

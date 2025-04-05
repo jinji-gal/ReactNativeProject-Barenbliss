@@ -8,9 +8,6 @@ const BASE_URL = "http://192.168.100.170:3000"; // Base URL without /api
 
 export const sendOrderStatusNotification = async (orderId, status, userId) => {
   try {
-    // In a real app, you would fetch the user's push token from your database
-    // For this example, we'll just show a local notification
-    
     // Title and body for different statuses
     const messages = {
       'pending': {
@@ -40,15 +37,30 @@ export const sendOrderStatusNotification = async (orderId, status, userId) => {
       body: `Your order #${orderId.substr(-8)} status has been updated to ${status}.`
     };
 
+    // Schedule an immediate notification
     await Notifications.scheduleNotificationAsync({
       content: {
         title: message.title,
         body: message.body,
-        data: { orderId, screen: 'OrderDetails' },
+        data: { 
+          orderId, 
+          screen: 'OrderDetails',
+          status: status,
+          type: 'order_status_update' 
+        },
       },
       trigger: null, // Null trigger means the notification fires immediately
     });
 
+    // Also send to server for push notification to the user
+    const token = await SecureStore.getItemAsync('userToken');
+    if (token) {
+      await axios.post(
+        `${API_URL}/orders/${orderId}/notify`, 
+        { status },
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+    }
   } catch (error) {
     console.error('Error sending notification:', error);
   }

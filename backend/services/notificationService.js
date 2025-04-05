@@ -116,6 +116,56 @@ const notifyOrderStatusChange = async (orderId, status) => {
   }
 };
 
+// Notify all users about a promotion
+const notifyAllUsersAboutPromotion = async (promotion) => {
+  try {
+    // Get all users with push tokens
+    const users = await User.find({ pushToken: { $exists: true, $ne: null } });
+    
+    if (!users.length) {
+      console.log('No users with push tokens found');
+      return;
+    }
+    
+    const message = {
+      title: 'New Promotion Available!',
+      body: `Use code ${promotion.code} for ${promotion.discountPercent}% off your next purchase!`
+    };
+    
+    // Send to all users with push tokens
+    let successCount = 0;
+    for (const user of users) {
+      try {
+        await sendPushNotification(
+          user.pushToken, 
+          message, 
+          { 
+            promotionId: promotion._id.toString(),
+            promoCode: promotion.code,
+            discountPercent: promotion.discountPercent,
+            type: 'new_promotion'
+          }
+        );
+        successCount++;
+      } catch (error) {
+        console.error(`Failed to send notification to user ${user._id}:`, error);
+        
+        // Clear invalid tokens
+        if (error.message && error.message.includes("DeviceNotRegistered")) {
+          user.pushToken = null;
+          await user.save();
+          console.log(`Cleared invalid push token for user ${user._id}`);
+        }
+      }
+    }
+    
+    console.log(`Sent promotion notification to ${successCount} users`);
+  } catch (error) {
+    console.error('Error notifying users about promotion:', error);
+  }
+};
+
 module.exports = {
-  notifyOrderStatusChange
+  notifyOrderStatusChange,
+  notifyAllUsersAboutPromotion
 };
