@@ -12,7 +12,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 // Connect to MongoDB
 mongoose.connect(MONGODB_URI)
   .then(() => {
-    console.log('Connected to MongoDB Atlas');
+    console.log('Connected to MongoDB Atlas successfully');
     migrateData();
   }).catch(err => {
     console.error('MongoDB connection error:', err);
@@ -25,7 +25,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
     console.error('Could not connect to SQLite database', err);
     process.exit(1);
   }
-  console.log('Connected to SQLite database');
+  console.log('Connected to SQLite database successfully');
 });
 
 // Migration function

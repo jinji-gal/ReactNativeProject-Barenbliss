@@ -4,31 +4,31 @@
     "slug": "barenbliss",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.donnabaldoza.barenbliss"
+      "bundleIdentifier": "com.jeanetoc.barenbliss"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/logo.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.donnabaldoza.barenbliss"
+      "package": "com.jeanetoc.barenbliss"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/logo.png"
     },
     "plugins": [
       [
@@ -42,7 +42,7 @@
     ],
     "scheme": "barenbliss",
     "facebookScheme": "fb1196596965367294",
-    "owner": "donn_baldoza",
+    "owner": "jean_etoc",
     "extra": {
       "googleClientId": "562957089179-v0glkbdo2sc169prvf84hhrdi0p2rouj.apps.googleusercontent.com",
       "facebookAppId": "1196596965367294",

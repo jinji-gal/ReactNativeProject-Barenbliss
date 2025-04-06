@@ -11,9 +11,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   productImage: {
-    width: '90%',
+    width: '100%',
     height: 350,
-    marginTop: 10,
     borderRadius: 10,
     alignSelf: 'center',
   },

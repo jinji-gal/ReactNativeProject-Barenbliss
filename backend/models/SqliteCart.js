@@ -25,7 +25,7 @@ const CartItem = sequelize.define('CartItem', {
 (async () => {
   try {
     await sequelize.sync();
-    console.log('SQLite database synchronized');
+    console.log('SQLite database synchronized successfully.');
   } catch (error) {
     console.error('Error synchronizing SQLite database:', error);
   }

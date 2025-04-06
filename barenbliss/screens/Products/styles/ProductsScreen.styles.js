@@ -83,9 +83,15 @@ const styles = StyleSheet.create({
   },
   filtersChipsContainer: {
     paddingHorizontal: 10,
+    paddingVertical: 5,
+    minHeight: 56,    // Ensure enough vertical space
     marginBottom: 10,
   },
   filtersChipsContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'nowrap',  // Prevent wrapping
+    paddingRight: 20,    // Extra space at the end
     paddingHorizontal: 10,
   },
   filterChip: {
@@ -250,7 +256,9 @@ const styles = StyleSheet.create({
   priceLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    width: '100%',
+    paddingHorizontal: 15,
+    marginBottom: 5,
   },
   filterActions: {
     flexDirection: 'row',
@@ -293,6 +301,11 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 10,
     fontWeight: 'bold',
+  },
+  rangeSliderContainer: {
+    alignItems: 'center',
+    marginVertical: 10,
+    paddingHorizontal: 10,
   },
 });
 

@@ -8,7 +8,7 @@ const db = new sqlite3.Database(dbPath, async (err) => {
     process.exit(1);
   } 
   
-  console.log('Connected to SQLite database');
+  console.log('Connected to SQLite database successfully');
   
   // Check if stockQuantity column exists
   db.all(`PRAGMA table_info(products)`, (err, columns) => {

@@ -64,7 +64,7 @@ const notifyOrderStatusChange = async (orderId, status) => {
     const order = await Order.findById(orderId).populate('user');
     
     if (!order || !order.user) {
-      console.log('Order not found or no user associated');
+      console.log('Order not found or no user associated with order');
       return;
     }
     
@@ -72,7 +72,7 @@ const notifyOrderStatusChange = async (orderId, status) => {
     const user = await User.findById(order.user);
     
     if (!user || !user.pushToken) {
-      console.log('User not found or has no push token');
+      console.log('User not found or has no push token associated');
       return;
     }
     

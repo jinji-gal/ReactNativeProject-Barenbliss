@@ -22,6 +22,7 @@ import styles from './styles/ProductsScreen.styles';
 import axios from 'axios';
 import { useFocusEffect } from '@react-navigation/native';
 import API from '../../utils/api';
+import MultiSlider from '@ptomasroos/react-native-multi-slider';
 
 const API_URL = "http://192.168.100.194:3000/api";
 const BASE_URL = "http://192.168.100.194:3000"; // Base URL without /api
@@ -337,13 +338,43 @@ const ProductsScreen = ({ navigation, route }) => {
           
           {(minPrice > productMinPrice || maxPrice < productMaxPrice) && (
             <TouchableOpacity
-              style={styles.filterChip}
+              style={[styles.filterChip, {
+                backgroundColor: '#fff',
+                borderWidth: 1,
+                borderColor: '#e89dae',
+                paddingHorizontal: 16, // Increased horizontal padding
+                paddingVertical: 8,   // Increased vertical padding
+                borderRadius: 25,     // Increased border radius
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginRight: 10,
+                marginVertical: 5,    // Added vertical margin
+                elevation: 2,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.2,
+                shadowRadius: 2,
+                minWidth: 120,        // Added minimum width
+                maxWidth: 200,        // Added maximum width
+              }]}
               onPress={toggleFilters}
             >
-              <Text style={styles.filterChipText}>
+              <Text style={[styles.filterChipText, {
+                color: '#e89dae',
+                fontSize: 13,
+                fontWeight: '500',
+                marginRight: 8,
+                flex: 1,             // Added flex to handle text wrapping
+                flexWrap: 'wrap'     // Enable text wrapping
+              }]}>
                 Price: ₱{Math.round(minPrice)} - ₱{Math.round(maxPrice)}
               </Text>
-              <Ionicons name="options-outline" size={16} color="#e89dae" />
+              <Ionicons 
+                name="options-outline" 
+                size={16}            // Increased icon size
+                color="#e89dae"
+                style={{ marginLeft: 4 }}
+              />
             </TouchableOpacity>
           )}
           
@@ -439,31 +470,41 @@ const ProductsScreen = ({ navigation, route }) => {
                     <Text>₱{Math.round(maxPrice)}</Text>
                   </View>
                   
-                  {/* Min price slider */}
-                  <Text>Minimum Price</Text>
-                  <Slider
-                    style={styles.slider}
-                    minimumValue={productMinPrice}
-                    maximumValue={productMaxPrice}
-                    value={minPrice}
-                    onValueChange={setMinPrice}
-                    step={10}
-                    minimumTrackTintColor="#e89dae"
-                    maximumTrackTintColor="#d3d3d3"
-                  />
-                  
-                  {/* Max price slider */}
-                  <Text>Maximum Price</Text>
-                  <Slider
-                    style={styles.slider}
-                    minimumValue={productMinPrice}
-                    maximumValue={productMaxPrice}
-                    value={maxPrice}
-                    onValueChange={setMaxPrice}
-                    step={10}
-                    minimumTrackTintColor="#e89dae"
-                    maximumTrackTintColor="#d3d3d3"
-                  />
+                  {/* Range Slider */}
+                  <View style={styles.rangeSliderContainer}>
+                    <MultiSlider
+                      values={[minPrice, maxPrice]}
+                      min={productMinPrice}
+                      max={productMaxPrice}
+                      step={10}
+                      onValuesChange={(values) => {
+                        setMinPrice(values[0]);
+                        setMaxPrice(values[1]);
+                      }}
+                      sliderLength={280}
+                      selectedStyle={{
+                        backgroundColor: '#e89dae',
+                      }}
+                      unselectedStyle={{
+                        backgroundColor: '#d3d3d3',
+                      }}
+                      containerStyle={{
+                        height: 40,
+                      }}
+                      trackStyle={{
+                        height: 4,
+                        backgroundColor: '#d3d3d3',
+                      }}
+                      markerStyle={{
+                        height: 20,
+                        width: 20,
+                        backgroundColor: '#e89dae',
+                        borderWidth: 2,
+                        borderColor: '#fff',
+                        elevation: 3,
+                      }}
+                    />
+                  </View>
                 </View>
                 
                 <View style={styles.filterActions}>

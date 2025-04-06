@@ -9,7 +9,7 @@ const db = new sqlite3.Database(dbPath, async (err) => {
     process.exit(1);
   } 
   
-  console.log('Connected to SQLite database');
+  console.log('Connected to SQLite database successfully');
   
   // Check if admin column exists, if not add it
   db.all(`PRAGMA table_info(users)`, (err, columns) => {
